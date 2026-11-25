@@ -49,7 +49,7 @@ The code uses Repository and Adapter patterns, constructor/dependency injection,
 
 Public signup is `POST /api/auth/signup` with a 3-32 character username and a password of at least 12 characters. New accounts are normalized to lowercase, Argon2-hashed, and always assigned the `USER` role. The endpoint returns 409 for an existing username; sign-in uses HTTP Basic at `/api/auth/me`.
 
-Public catalog: `GET /api/menu_items` supports `category`, `vegetarian`, `max_price`, and `keyword`; public detail is `GET /api/menu_items/{id}`. Admin catalog operations are `POST`, `PUT /api/menu_items/{id}`, and `DELETE /api/menu_items/{id}`. Delete permanently removes a dish with no order references; otherwise it archives the dish and keeps historical order lines intact. Archived dishes are hidden from the active menu.
+Public catalog: `GET /api/menu_items` supports `category`, `vegetarian`, `max_price`, and `keyword`; public detail is `GET /api/menu_items/{id}`. Admin catalog operations are `POST`, `PUT /api/menu_items/{id}`, and `DELETE /api/menu_items/{id}`. Admins can disable or re-enable a dish with `PUT` and the `active` field. Delete permanently removes a dish with no order references; otherwise it archives the dish and keeps historical order lines intact. Disabled and archived dishes are hidden from the customer menu.
 
 Authenticated order operations are `POST /api/orders` with an `Idempotency-Key` header and `{ "lines": [{"item_id": 1, "quantity": 1}] }`, `GET /api/orders`, `GET /api/orders/{id}`, and `POST /api/orders/{id}/cancel`. Admin status updates use `PATCH /api/admin/orders/{id}/status`.
 
@@ -61,7 +61,7 @@ The Gemini API key and database password stay server-side. The browser keeps Bas
 
 ## Demo accounts and seed data
 
-Startup seeds ten fictional menu items, two customer accounts, one admin, and three sample orders only when the corresponding tables are empty. Change the `.env` demo passwords before the first run. The admin can add/edit/disable items, upload policy files, and advance an order through `CONFIRMED` → `PREPARING` → `READY` → `COMPLETED`. Customers can browse without login, then sign in to create/view/cancel their own orders and retain their chat history.
+Startup seeds ten fictional menu items, two customer accounts, one admin, and three sample orders only when the corresponding tables are empty. Change the `.env` demo passwords before the first run. The admin can add/edit/disable/re-enable/delete items, upload policy files, and advance an order through `CONFIRMED` → `PREPARING` → `READY` → `COMPLETED`. Customers can browse without login, then sign in to create/view/cancel their own orders and retain their chat history.
 
 Upload the starter files in `app/knowledge_base` from the admin account to populate the RAG knowledge base. Declared allergen information is not a safety guarantee; cross-contact cannot be ruled out.
 

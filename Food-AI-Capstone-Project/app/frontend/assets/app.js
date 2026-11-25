@@ -60,6 +60,7 @@ async function loadMenu() {
   if ($("#categoryFilter").value) params.set("category", $("#categoryFilter").value);
   if ($("#vegetarianFilter").checked) params.set("vegetarian", "true");
   if ($("#priceFilter").value) params.set("max_price", $("#priceFilter").value);
+  if (currentUser?.role === "ADMIN") params.set("include_inactive", "true");
   try {
     menuItems = await api(`/api/menu_items?${params}`);
     fillCategories(menuItems);
@@ -76,7 +77,7 @@ function renderMenu() {
   $("#menuEmpty").classList.toggle("hidden", menuItems.length > 0);
   for (const item of menuItems) {
     const card = document.createElement("article");
-    card.className = "menu-card";
+    card.className = item.active ? "menu-card" : "menu-card menu-card-disabled";
     const image = document.createElement("img");
     image.className = "food-image";
     image.src = item.image_url || "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80";
@@ -108,14 +109,14 @@ function renderMenu() {
     price.textContent = money(item.price);
     const stock = document.createElement("span");
     stock.className = "dish-stock";
-    stock.textContent = item.capacity > 0 ? `${item.capacity} portions` : "Sold out";
+    stock.textContent = !item.active ? "Disabled" : item.capacity > 0 ? `${item.capacity} portions` : "Sold out";
     meta.append(price, stock);
     const actions = document.createElement("div");
     actions.className = "dish-actions";
     const add = document.createElement("button");
     add.className = "button button-accent";
     add.type = "button";
-    add.disabled = item.capacity < 1;
+    add.disabled = !item.active || item.capacity < 1;
     add.textContent = "Add to bag";
     add.addEventListener("click", () => addToCart(item));
     actions.append(add);
@@ -126,6 +127,22 @@ function renderMenu() {
       edit.textContent = "Edit";
       edit.addEventListener("click", () => startEdit(item));
       actions.append(edit);
+      const availability = document.createElement("button");
+      availability.className = "button button-outline";
+      availability.type = "button";
+      availability.textContent = item.active ? "Disable" : "Enable";
+      availability.addEventListener("click", async () => {
+        const nextActive = !item.active;
+        try {
+          await api(`/api/menu_items/${item.id}`, {
+            method: "PUT",
+            body: JSON.stringify({ active: nextActive }),
+          });
+          showNotice(nextActive ? "Dish enabled on the active menu." : "Dish disabled from the active menu.");
+          await loadMenu();
+        } catch (error) { showNotice(error.message, true); }
+      });
+      actions.append(availability);
       const deleteItem = document.createElement("button");
       deleteItem.className = "button button-outline";
       deleteItem.type = "button";

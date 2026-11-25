@@ -4,9 +4,9 @@
 
 Command: `python -m pytest -q`
 
-Result: **22 passed**.
+Result: **25 passed**.
 
-Coverage includes customer signup, username normalization and duplicate rejection, Argon2 password hashing and automatic authentication, unique dish-matched menu image URLs, public menu filters, Pydantic validation, admin-only catalog operations, permanent deletion of unreferenced dishes and archival of order-referenced dishes, order price snapshots, request idempotency, ownership checks, inventory rollback on failure, cancellation capacity restoration, persistent chat history, AI outage persistence, pending-action staging/rejection/idempotent confirmation, mandatory quantity clarification before order staging, Gemini policy-tool mode/citations, document upload/re-index versioning, and RAG chunking/file type validation.
+Coverage includes customer signup, username normalization and duplicate rejection, Argon2 password hashing and automatic authentication, unique dish-matched menu image URLs, public menu filters, Pydantic validation, admin-only catalog operations, disable/re-enable visibility, permanent deletion of unreferenced dishes and archival of order-referenced dishes, order price snapshots, request idempotency, ownership checks, inventory rollback on failure, cancellation capacity restoration, persistent chat history, AI outage persistence, pending-action staging/rejection/idempotent confirmation, mandatory quantity clarification before order staging, Gemini policy-tool mode/citations, document upload/re-index versioning, and RAG chunking/file type validation.
 
 Tests use isolated SQLite files and mocked Gemini/vector adapters. This keeps them deterministic and does not require user credentials.
 

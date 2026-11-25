@@ -82,6 +82,7 @@ h3 { font-size: 15px; line-height: 1.35; }
 .result-count { color: var(--ink-soft); font-size: 12px; }
 .menu-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; }
 .menu-card { overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: var(--white); transition: box-shadow .18s ease, transform .18s ease; }
+.menu-card-disabled { opacity: .68; }
 .menu-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px #20302b12; }
 .food-image { width: 100%; height: 142px; display: block; object-fit: cover; background: #dcebd8; }
 .menu-card-body { padding: 14px; }

@@ -133,6 +133,39 @@ async def test_admin_catalog_permissions_and_soft_disable(client):
 
 
 @pytest.mark.asyncio
+async def test_admin_can_disable_and_reenable_menu_item(client):
+    api, _ = client
+    payload = {
+        "title": "Seasonal Bowl",
+        "category": "Main course",
+        "vegetarian": True,
+        "price": "125.00",
+        "capacity": 5,
+        "description": "A seasonal bowl.",
+        "declared_allergens": "Not specified",
+    }
+    created = await api.post("/api/menu_items", json=payload, headers=ADMIN)
+    item_id = created.json()["id"]
+
+    disabled = await api.put(
+        f"/api/menu_items/{item_id}", json={"active": False}, headers=ADMIN
+    )
+    assert disabled.status_code == 200
+    assert disabled.json()["active"] is False
+    assert (await api.get(f"/api/menu_items/{item_id}")).status_code == 404
+    admin_list = await api.get(
+        "/api/menu_items", params={"include_inactive": True}, headers=ADMIN
+    )
+    assert next(item for item in admin_list.json() if item["id"] == item_id)["active"] is False
+
+    enabled = await api.put(
+        f"/api/menu_items/{item_id}", json={"active": True}, headers=ADMIN
+    )
+    assert enabled.json()["active"] is True
+    assert (await api.get(f"/api/menu_items/{item_id}")).status_code == 200
+
+
+@pytest.mark.asyncio
 async def test_delete_referenced_menu_item_archives_and_preserves_order_history(client):
     api, app = client
     deleted = await api.delete("/api/menu_items/1", headers=ADMIN)
