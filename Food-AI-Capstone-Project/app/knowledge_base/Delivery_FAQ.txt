@@ -1,0 +1,7 @@
+Delivery FAQ
+Version: 1
+Effective date: 2026-01-01
+
+This capstone is a local demonstration. It does not book a courier, calculate a real delivery route, or provide a live delivery estimate. An order status is changed by the restaurant administrator in the demo.
+
+Menu capacity is the number of portions currently available in the catalog. A successful order reduces capacity. A permitted cancellation restores it.

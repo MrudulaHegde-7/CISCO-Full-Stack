@@ -1,0 +1,7 @@
+Restaurant Policy
+Version: 1
+Effective date: 2026-01-01
+
+Orders may be cancelled only while their status is CONFIRMED and before food preparation begins. Once an order enters PREPARING, cancellation is not available through this demo application. The ordering application checks the current order status before accepting cancellation.
+
+Menu capacity represents portions available for ordering. Capacity is rechecked and reserved in the same database transaction that creates an order. This fictional restaurant demo does not contact a real kitchen or delivery provider.

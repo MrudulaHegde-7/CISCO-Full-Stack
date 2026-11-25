@@ -1,0 +1,1 @@
+"""Food assistant test suite."""

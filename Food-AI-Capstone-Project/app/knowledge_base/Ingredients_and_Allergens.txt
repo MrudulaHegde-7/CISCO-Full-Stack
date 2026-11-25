@@ -1,0 +1,13 @@
+Ingredients and Allergens
+Version: 1
+Effective date: 2026-01-01
+
+Masala Dosa: rice and lentil crepe, spiced potato filling. Declared allergen note: mustard may be present in tempering.
+Paneer Biryani: rice, paneer, spices. Declared allergen: dairy.
+Idli Sambar: rice and lentil cakes with lentil stew. Declared allergen note: mustard may be present in tempering.
+Paneer Tikka: paneer and peppers. Declared allergen: dairy.
+Garden Salad: vegetables with dressing. Declared allergen: mustard in dressing.
+Gulab Jamun: milk-solid dumplings. Declared allergens: dairy and wheat.
+Lemon Rice: rice with lemon and peanuts. Declared allergens: peanuts and mustard.
+
+This fictional guide lists declared ingredients only. Cross-contact in a shared kitchen cannot be ruled out. The restaurant assistant must not guarantee allergen safety. Customers with allergies should contact restaurant staff before ordering.

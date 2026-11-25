@@ -1,0 +1,16 @@
+Food Menu
+Version: 1
+Effective date: 2026-01-01
+
+Masala Dosa is a vegetarian breakfast dish priced at INR 90.
+Paneer Biryani is a vegetarian main course priced at INR 180.
+Idli Sambar is a vegetarian breakfast dish priced at INR 70.
+Vegetable Pulao is a vegetarian main course priced at INR 150.
+Chana Masala is a vegetarian main course priced at INR 160.
+Paneer Tikka is a vegetarian starter priced at INR 190.
+Garden Salad is a vegetarian side priced at INR 110.
+Chicken Curry is a non-vegetarian main course priced at INR 220.
+Gulab Jamun is a vegetarian dessert priced at INR 80.
+Lemon Rice is a vegetarian side priced at INR 95.
+
+Live prices and availability are provided by the menu API. This document may be out of date; use the live menu API for current catalog facts.

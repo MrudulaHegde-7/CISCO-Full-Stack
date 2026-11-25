@@ -1,0 +1,5 @@
+Refund Policy
+Version: 1
+Effective date: 2026-01-01
+
+This project uses simulated orders and does not collect payment. There are no actual charges or refunds. For the demo, an order in CONFIRMED status may be cancelled and its reserved portion capacity restored once. Orders in PREPARING, READY, or COMPLETED status cannot be cancelled by a customer in this application.

@@ -1,0 +1,1 @@
+"""Food ordering and restaurant assistant application."""
