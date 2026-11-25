@@ -20,13 +20,14 @@ class CatalogService:
         max_price: Decimal | None = None,
         keyword: str | None = None,
         admin: bool = False,
+        include_inactive: bool = False,
     ) -> list[MenuItem]:
         return self.repository.search(
             category=category,
             vegetarian=vegetarian,
             max_price=float(max_price) if max_price is not None else None,
             keyword=keyword,
-            active_only=not admin,
+            active_only=not (admin and include_inactive),
         )
 
     def get(self, item_id: int, *, include_inactive: bool = False) -> MenuItem:
@@ -45,6 +46,6 @@ class CatalogService:
                 setattr(item, field, value)
         return item
 
-    def disable(self, item_id: int) -> None:
+    def delete(self, item_id: int) -> str:
         item = self.get(item_id, include_inactive=True)
-        item.active = False
+        return self.repository.delete_or_archive(item)

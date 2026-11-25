@@ -1,7 +1,7 @@
 from sqlalchemy import Select, select
 from sqlalchemy.orm import Session, selectinload
 
-from app.models import MenuItem, Order, User
+from app.models import MenuItem, Order, OrderLine, User
 
 
 class SQLAlchemyUserRepository:
@@ -68,6 +68,19 @@ class SQLAlchemyMenuRepository:
         self.session.add(item)
         self.session.flush()
         return item
+
+    def delete_or_archive(self, item: MenuItem) -> str:
+        referenced = self.session.scalar(
+            select(OrderLine.id).where(OrderLine.item_id == item.id).limit(1)
+        )
+        if referenced is not None:
+            item.active = False
+            self.session.flush()
+            return "archived"
+
+        self.session.delete(item)
+        self.session.flush()
+        return "deleted"
 
 
 class SQLAlchemyOrderRepository:

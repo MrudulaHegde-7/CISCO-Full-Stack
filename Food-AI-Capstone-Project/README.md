@@ -29,6 +29,8 @@ uvicorn main:app --reload
 
 The app creates missing tables and demo data at startup. Browse the application at http://127.0.0.1:8000, Swagger at `/docs`, and OpenAPI at `/openapi.json`. The seeded usernames and their passwords are configured by `DEMO_*` values in `.env`; passwords are Argon2-hashed in MySQL.
 
+To change the password for the already-seeded admin account, run `../.venv/bin/python -m app.reset_admin_password` from this directory and enter the new password twice at the hidden terminal prompts. The command updates the existing MySQL password hash; changing `DEMO_ADMIN_PASSWORD` alone does not reset an existing account.
+
 `DATABASE_URL`, `GEMINI_API_KEY`, and the three demo passwords must be set for a useful local run. The server can start without a Gemini key, but chat and document embedding return a safe 503 until one is configured. MySQL must be running and the configured database must exist.
 
 ## Layers and patterns
@@ -47,7 +49,7 @@ The code uses Repository and Adapter patterns, constructor/dependency injection,
 
 Public signup is `POST /api/auth/signup` with a 3-32 character username and a password of at least 12 characters. New accounts are normalized to lowercase, Argon2-hashed, and always assigned the `USER` role. The endpoint returns 409 for an existing username; sign-in uses HTTP Basic at `/api/auth/me`.
 
-Public catalog: `GET /api/menu_items` supports `category`, `vegetarian`, `max_price`, and `keyword`; public detail is `GET /api/menu_items/{id}`. Admin catalog operations are `POST`, `PUT /api/menu_items/{id}`, and `DELETE /api/menu_items/{id}` (soft-disable).
+Public catalog: `GET /api/menu_items` supports `category`, `vegetarian`, `max_price`, and `keyword`; public detail is `GET /api/menu_items/{id}`. Admin catalog operations are `POST`, `PUT /api/menu_items/{id}`, and `DELETE /api/menu_items/{id}`. Delete permanently removes a dish with no order references; otherwise it archives the dish and keeps historical order lines intact. Archived dishes are hidden from the active menu.
 
 Authenticated order operations are `POST /api/orders` with an `Idempotency-Key` header and `{ "lines": [{"item_id": 1, "quantity": 1}] }`, `GET /api/orders`, `GET /api/orders/{id}`, and `POST /api/orders/{id}/cancel`. Admin status updates use `PATCH /api/admin/orders/{id}/status`.
 

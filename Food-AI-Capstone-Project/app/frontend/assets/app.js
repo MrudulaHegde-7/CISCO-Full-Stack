@@ -25,7 +25,9 @@ async function api(path, options = {}) {
   if (credentials) headers.set("Authorization", credentials);
   if (options.body && !(options.body instanceof FormData)) headers.set("Content-Type", "application/json");
   const response = await fetch(path, { ...options, headers });
-  if (response.status === 204) return null;
+  if (response.status === 204) {
+    return { removalMode: response.headers.get("X-Menu-Item-Removal") };
+  }
   const body = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(body.message || body.detail || `Request failed (${response.status})`);
   return body;
@@ -124,19 +126,21 @@ function renderMenu() {
       edit.textContent = "Edit";
       edit.addEventListener("click", () => startEdit(item));
       actions.append(edit);
-      const disable = document.createElement("button");
-      disable.className = "button button-outline";
-      disable.type = "button";
-      disable.textContent = "Disable";
-      disable.addEventListener("click", async () => {
-        if (!window.confirm(`Disable ${item.title} from the active menu?`)) return;
+      const deleteItem = document.createElement("button");
+      deleteItem.className = "button button-outline";
+      deleteItem.type = "button";
+      deleteItem.textContent = "Delete";
+      deleteItem.addEventListener("click", async () => {
+        if (!window.confirm(`Remove ${item.title} from the active menu? Its past order history will be kept.`)) return;
         try {
-          await api(`/api/menu_items/${item.id}`, { method: "DELETE" });
-          showNotice("Menu item disabled.");
+          const result = await api(`/api/menu_items/${item.id}`, { method: "DELETE" });
+          showNotice(result?.removalMode === "archived"
+            ? "Dish archived to preserve past order history."
+            : "Dish permanently deleted.");
           await loadMenu();
         } catch (error) { showNotice(error.message, true); }
       });
-      actions.append(disable);
+      actions.append(deleteItem);
     }
     body.append(top, description, meta, actions);
     card.append(image, body);
@@ -302,6 +306,13 @@ function clearMenuForm() {
   $("#editItemId").value = "";
 }
 
+function clearMenuFilters() {
+  $("#keywordFilter").value = "";
+  $("#categoryFilter").value = "";
+  $("#vegetarianFilter").checked = false;
+  $("#priceFilter").value = "";
+}
+
 async function saveMenuItem(event) {
   event.preventDefault();
   const id = $("#editItemId").value;
@@ -318,6 +329,7 @@ async function saveMenuItem(event) {
   try {
     await api(id ? `/api/menu_items/${id}` : "/api/menu_items", { method: id ? "PUT" : "POST", body: JSON.stringify(body) });
     clearMenuForm();
+    clearMenuFilters();
     showNotice(id ? "Menu item updated." : "Menu item added.");
     await loadMenu();
   } catch (error) { showNotice(error.message, true); }
@@ -616,10 +628,7 @@ function bindEvents() {
     $(selector).addEventListener(selector === "#keywordFilter" ? "input" : "change", loadMenu);
   });
   $("#clearFilters").addEventListener("click", () => {
-    $("#keywordFilter").value = "";
-    $("#categoryFilter").value = "";
-    $("#vegetarianFilter").checked = false;
-    $("#priceFilter").value = "";
+    clearMenuFilters();
     loadMenu();
   });
 }

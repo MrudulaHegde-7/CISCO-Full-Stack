@@ -44,7 +44,7 @@ flowchart LR
     Pending --> Confirm{Explicit confirmation?}
     Confirm -->|Yes| Orders
     Confirm -->|No| Reject[Record rejection; do not mutate]
-    Admin([Administrator]) --> Catalog[Create, edit, soft-disable menu items]
+    Admin([Administrator]) --> Catalog[Create, edit, delete or archive menu items]
     Admin --> Knowledge[Upload and re-index policy documents]
     Admin --> Status[Advance permitted order statuses]
 ```

@@ -1,6 +1,7 @@
 from sqlalchemy import func, select
 import pytest
 
+from app.config import settings
 from app.agents.tools import AgentTools
 from app.agents.orchestrator import GeminiAgent
 from app.models import Order, PendingAction, User
@@ -18,7 +19,7 @@ async def test_agent_order_tool_only_stages_pending_action(client, monkeypatch):
     created = await api.post(
         "/api/chat/sessions",
         json={},
-        headers=basic_auth("maya", "ChangeThisMayaPassword!"),
+        headers=basic_auth(settings.demo_user_one_username, settings.demo_user_one_password),
     )
     chat_session_id = created.json()["id"]
     with app.state.session_factory() as session:
@@ -68,7 +69,7 @@ async def test_order_without_portion_count_asks_before_staging_action(client, mo
     created = await api.post(
         "/api/chat/sessions",
         json={},
-        headers=basic_auth("maya", "ChangeThisMayaPassword!"),
+        headers=basic_auth(settings.demo_user_one_username, settings.demo_user_one_password),
     )
     chat_session_id = created.json()["id"]
     with app.state.session_factory() as session:
@@ -211,7 +212,7 @@ async def test_unreturned_action_is_rolled_back_when_gemini_fails(client, monkey
     created = await api.post(
         "/api/chat/sessions",
         json={},
-        headers=basic_auth("maya", "ChangeThisMayaPassword!"),
+        headers=basic_auth(settings.demo_user_one_username, settings.demo_user_one_password),
     )
     session_id = created.json()["id"]
     calls = 0
@@ -243,11 +244,14 @@ async def test_unreturned_action_is_rolled_back_when_gemini_fails(client, monkey
     response = await api.post(
         f"/api/chat/sessions/{session_id}/messages",
         json={"message": "Order a dosa."},
-        headers=basic_auth("maya", "ChangeThisMayaPassword!"),
+        headers=basic_auth(settings.demo_user_one_username, settings.demo_user_one_password),
     )
 
     assert response.status_code == 503
-    actions = await api.get(f"/api/chat/sessions/{session_id}/actions", headers=basic_auth("maya", "ChangeThisMayaPassword!"))
+    actions = await api.get(
+        f"/api/chat/sessions/{session_id}/actions",
+        headers=basic_auth(settings.demo_user_one_username, settings.demo_user_one_password),
+    )
     assert actions.json() == []
 
 

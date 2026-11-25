@@ -3,12 +3,13 @@ from decimal import Decimal
 import pytest
 from sqlalchemy import select
 
-from app.models import MenuItem, Order, User
+from app.config import settings
+from app.models import MenuItem, Order, OrderLine, User
 from tests.conftest import basic_auth
 
-ADMIN = basic_auth("admin", "ChangeThisAdminPassword!")
-MAYA = basic_auth("maya", "ChangeThisMayaPassword!")
-ARJUN = basic_auth("arjun", "ChangeThisArjunPassword!")
+ADMIN = basic_auth(settings.demo_admin_username, settings.demo_admin_password)
+MAYA = basic_auth(settings.demo_user_one_username, settings.demo_user_one_password)
+ARJUN = basic_auth(settings.demo_user_two_username, settings.demo_user_two_password)
 
 
 @pytest.mark.asyncio
@@ -115,13 +116,34 @@ async def test_admin_catalog_permissions_and_soft_disable(client):
     created = await api.post("/api/menu_items", json=payload, headers=ADMIN)
     assert created.status_code == 201
     item_id = created.json()["id"]
+    immediately_listed = await api.get(
+        "/api/menu_items", params={"keyword": "Seasonal Bowl"}
+    )
+    assert any(item["id"] == item_id for item in immediately_listed.json())
     updated = await api.put(
         f"/api/menu_items/{item_id}", json={"capacity": 8}, headers=ADMIN
     )
     assert updated.json()["capacity"] == 8
+    immediately_updated = await api.get(f"/api/menu_items/{item_id}")
+    assert immediately_updated.json()["capacity"] == 8
     disabled = await api.delete(f"/api/menu_items/{item_id}", headers=ADMIN)
     assert disabled.status_code == 204
+    assert disabled.headers["x-menu-item-removal"] == "deleted"
     assert (await api.get(f"/api/menu_items/{item_id}")).status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_referenced_menu_item_archives_and_preserves_order_history(client):
+    api, app = client
+    deleted = await api.delete("/api/menu_items/1", headers=ADMIN)
+    assert deleted.status_code == 204
+    assert deleted.headers["x-menu-item-removal"] == "archived"
+    assert (await api.get("/api/menu_items/1")).status_code == 404
+    active_menu = await api.get("/api/menu_items")
+    assert all(item["id"] != 1 for item in active_menu.json())
+    with app.state.session_factory() as session:
+        assert session.get(MenuItem, 1).active is False
+        assert session.scalar(select(OrderLine.id).where(OrderLine.item_id == 1)) is not None
 
 
 @pytest.mark.asyncio
