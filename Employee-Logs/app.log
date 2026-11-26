@@ -1,0 +1,13 @@
+2026-11-26 06:23:30,174 | INFO | employee_app | Employee Management API started
+2026-11-26 06:24:53,223 | INFO | employee_app | Created employee id=1 email=maya@example.com
+2026-11-26 06:24:53,232 | INFO | employee_app | Listed 1 employees
+2026-11-26 06:28:19,630 | INFO | employee_app | Created employee id=2 email=mru@gmail.com
+2026-11-26 06:28:35,429 | INFO | employee_app | Listed 2 employees
+2026-11-26 06:29:08,499 | INFO | employee_app | Fetched employee id=1
+2026-11-26 06:29:55,568 | INFO | employee_app | Updated employee id=2
+2026-11-26 06:57:08,513 | INFO | employee_app | Employee Management API started
+2026-11-26 06:58:38,395 | INFO | employee_app | Created employee id=1 email=mru@gmail.com
+2026-11-26 06:58:47,635 | INFO | employee_app | Listed 1 employees
+2026-11-26 06:58:49,485 | INFO | employee_app | Listed 1 employees
+2026-11-26 06:59:01,761 | INFO | employee_app | Fetched employee id=1
+2026-11-26 06:59:43,617 | INFO | employee_app | Updated employee id=1

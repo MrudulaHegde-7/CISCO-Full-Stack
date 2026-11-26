@@ -1,1 +1,6 @@
 .venv/
+NetPulse/netpulse.db
+NetPulse/logs/
+NetPulse/.pytest_cache/
+NetPulse/**/__pycache__/
+NetPulse/**/*.py[cod]

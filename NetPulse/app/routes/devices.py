@@ -1,5 +1,9 @@
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.orm import Session
+import structlog
 
+from app.db.database import get_session
+from app.logging_config import safe_device_id
 from app.models import (
     AlertResponse,
     DeviceCreate,
@@ -8,15 +12,17 @@ from app.models import (
     StatusUpdate,
 )
 from app.services.probe import simulate_device_probe
-from app.services.device_service import (
-    DeviceService,
-)
+from app.repositories.sqlalchemy_device_repository import SQLAlchemyDeviceRepository
+from app.services.device_service import DeviceService
 
 router = APIRouter()
+logger = structlog.get_logger("netpulse.routes.devices")
 
 
-def get_device_service(request: Request) -> DeviceService:
-    return request.app.state.device_service
+def get_device_service(
+    session: Session = Depends(get_session, scope="function"),
+) -> DeviceService:
+    return DeviceService(SQLAlchemyDeviceRepository(session))
 
 
 @router.post(
@@ -29,6 +35,10 @@ def register_device(
     device: DeviceCreate,
     service: DeviceService = Depends(get_device_service),
 ) -> DeviceResponse:
+    logger.info(
+        "device_registration_requested",
+        device_id=safe_device_id(device.device_id),
+    )
     return service.register(device)
 
 
