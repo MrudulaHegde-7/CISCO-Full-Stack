@@ -1,9 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Request, status
 
-from app.models import AlertResponse, DeviceCreate, DeviceResponse, StatusUpdate
+from app.models import (
+    AlertResponse,
+    DeviceCreate,
+    DeviceResponse,
+    DeviceSummary,
+    StatusUpdate,
+)
+from app.services.probe import simulate_device_probe
 from app.services.device_service import (
-    DeviceAlreadyExistsError,
-    DeviceNotFoundError,
     DeviceService,
 )
 
@@ -24,13 +29,7 @@ def register_device(
     device: DeviceCreate,
     service: DeviceService = Depends(get_device_service),
 ) -> DeviceResponse:
-    try:
-        return service.register(device)
-    except DeviceAlreadyExistsError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Device '{device.device_id}' already exists.",
-        ) from exc
+    return service.register(device)
 
 
 @router.get("/devices", response_model=list[DeviceResponse])
@@ -38,6 +37,25 @@ def list_devices(
     service: DeviceService = Depends(get_device_service),
 ) -> list[DeviceResponse]:
     return service.list()
+
+
+@router.get("/devices/summary", response_model=DeviceSummary)
+def get_device_summary(
+    service: DeviceService = Depends(get_device_service),
+) -> DeviceSummary:
+    return service.get_device_summary()
+
+
+@router.get(
+    "/devices/{device_id}/probe",
+    responses={404: {"description": "Device not found."}},
+)
+async def probe_device(
+    device_id: str,
+    service: DeviceService = Depends(get_device_service),
+) -> dict[str, str | bool]:
+    service.get(device_id)
+    return await simulate_device_probe(device_id)
 
 
 @router.get(
@@ -49,13 +67,7 @@ def get_device(
     device_id: str,
     service: DeviceService = Depends(get_device_service),
 ) -> DeviceResponse:
-    try:
-        return service.get(device_id)
-    except DeviceNotFoundError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Device '{device_id}' was not found.",
-        ) from exc
+    return service.get(device_id)
 
 
 @router.patch(
@@ -68,13 +80,7 @@ def update_device_status(
     update: StatusUpdate,
     service: DeviceService = Depends(get_device_service),
 ) -> DeviceResponse:
-    try:
-        return service.update_status(device_id, update.status)
-    except DeviceNotFoundError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Device '{device_id}' was not found.",
-        ) from exc
+    return service.update_status(device_id, update.status)
 
 
 @router.get("/alerts", response_model=list[AlertResponse])

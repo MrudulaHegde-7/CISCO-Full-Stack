@@ -41,6 +41,13 @@ class DeviceResponse(DeviceCreate):
     pass
 
 
+class DeviceSummary(BaseModel):
+    total_devices: int
+    online_count: int
+    offline_count: int
+    device_types: list[DeviceType]
+
+
 class StatusUpdate(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={"example": {"status": "offline"}}
